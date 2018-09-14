@@ -26,11 +26,14 @@ Route::group(['middleware' => 'auth'], function() {
     // 开始
     Route::group(['middleware' => 'email_verified'], function() {
 
-        Route::get('user_addresses', 'UserAddressesController@index')->name('user_addresses.index');
-        Route::get('user_addresses/create', 'UserAddressesController@create')->name('user_addresses.create');
-        Route::post('user_addresses/store', 'UserAddressesController@store')->name('user_addresses.store');
+//        Route::get('user_addresses', 'UserAddressesController@index')->name('user_addresses.index');
+//        Route::get('user_addresses/create', 'UserAddressesController@create')->name('user_addresses.create');
+//        Route::post('user_addresses/store', 'UserAddressesController@store')->name('user_addresses.store');
+//        Route::get('user_addresses/{user_address}/edit', 'UserAddressesController@edit')->name('user_addresses.edit');
+//        Route::patch('user_addresses/{user_address}', 'UserAddressesController@update')->name('user_addresses.update');
+//        Route::delete('user_addresses/{user_address}', 'UserAddressesController@destroy')->name('user_addresses.destroy');
 
-
+        Route::resource('user_addresses','UserAddressesController')->except('show');
     });
     // 结束
 });
