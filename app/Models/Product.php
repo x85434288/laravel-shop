@@ -15,7 +15,7 @@ class Product extends Model
     ];
 
     //商品与商品sku关联
-    public function sku()
+    public function skus()
     {
 
         return $this->hasMany(ProductSku::class);
