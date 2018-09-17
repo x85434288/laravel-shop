@@ -34,6 +34,7 @@ Route::group(['middleware' => 'auth'], function() {
 //        Route::delete('user_addresses/{user_address}', 'UserAddressesController@destroy')->name('user_addresses.destroy');
 
         Route::resource('user_addresses','UserAddressesController')->except('show');
+
     });
     // 结束
 });
