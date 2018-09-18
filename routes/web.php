@@ -15,7 +15,7 @@
 //    return view('welcome');
 //});
 
-Route::get('/','PagesController@root')->name('root');
+
 
 Auth::routes();
 
@@ -33,12 +33,18 @@ Route::group(['middleware' => 'auth'], function() {
 //        Route::patch('user_addresses/{user_address}', 'UserAddressesController@update')->name('user_addresses.update');
 //        Route::delete('user_addresses/{user_address}', 'UserAddressesController@destroy')->name('user_addresses.destroy');
 
+        //用户详细地址路由
         Route::resource('user_addresses','UserAddressesController')->except('show');
-
-
 
     });
     // 结束
 });
 
+//首页重定向到商品列表页
+Route::redirect('/', '/products')->name('root');
+
+//商品列表页
 Route::get('/products','ProductsController@index')->name('products.index');
+
+//商品详细页
+Route::get('/products/{product}','ProductsController@show')->name('products.show');
