@@ -35,6 +35,10 @@ Route::group(['middleware' => 'auth'], function() {
 
         Route::resource('user_addresses','UserAddressesController')->except('show');
 
+
+
     });
     // 结束
 });
+
+Route::get('/products','ProductsController@index')->name('products.index');

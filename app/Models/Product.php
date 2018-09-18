@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\ProductSku;
+use Illuminate\Support\Str;
 
 class Product extends Model
 {
@@ -19,6 +20,18 @@ class Product extends Model
     {
 
         return $this->hasMany(ProductSku::class);
+    }
+
+    public function getImageUrlAttribute()
+    {
+        //取名为image_url是为了不和数据库中image形成干扰
+        $value = $this->attributes['image'];
+        //判断是否为云空间
+        if(Str::startsWith($value, ['http://', 'https://'])){
+            return $value;
+        }
+        return '/upload/'.$value;
+        
     }
 
 }
