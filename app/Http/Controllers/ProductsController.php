@@ -8,7 +8,7 @@ use App\Exceptions\InvalidRequestException;
 
 class ProductsController extends Controller
 {
-    //
+    //商品列表
     public function index(Product $product, Request $request)
     {
         //构造查询构造器
@@ -53,6 +53,7 @@ class ProductsController extends Controller
     }
 
 
+    //商品详情
     public function show(Product $product, Request $request)
     {
 
@@ -86,4 +87,12 @@ class ProductsController extends Controller
         $user->favoriteProducts()->detach($product->id);
         return [];
     }
+
+    public function favorites(Request $request)
+    {
+        $products = $request->user()->favoriteProducts()->paginate(12);
+        return view('products.favorites', compact('products'));
+    }
+
+
 }
