@@ -34,7 +34,7 @@
                                     @endforeach
                                 </div>
                             </div>
-                            <div class="cart_amount"><label>数量</label><input type="text" class="form-control input-sm" value="1"><span>件</span><span class="stock"></span></div>
+                            <div class="cart_amount"><label>数量</label><input type="text" class="form-control input-sm" name="stock" value="1"><span>件</span><span class="stock"></span></div>
                             <div class="buttons">
                                 @if($favor)
                                     <button class="btn btn-danger btn-disfavor">❤ 取消收藏</button>
@@ -107,6 +107,43 @@
                     });
                 });
 
+        });
+
+
+        //加入购物车
+        $('.btn-add-to-cart').click(function(){
+            var amount = $("input[name='stock']").val();
+            var sku_id = $("label.active input[name='skus']").val();
+            //判断是否选择sku类型和数量
+            if(amount>0&&sku_id){
+
+                axios.post('{{ route('cart_items.store') }}',{
+                    'amount': amount,
+                    'sku_id' : sku_id
+                }).then(function(){
+                    //请求成功
+                    swal('加入收藏成功','','success')
+                },function(error){
+                    //请求失败
+                    if(error.response&&error.response.data.message == 401){
+                        swal('请先登录','','error');
+                    }else if(error.response.status == 422){
+                       var html = '<div>';
+                        _.each(error.response.data.errors,function(errors){
+                            _.each(errors,function(error){
+                                html += error + '<br/>';
+                            })
+                        })
+                        html = html+'</div>';
+                        swal({content: $(html)[0], icon: 'error'})
+                    }else{
+                        swal('系统错误','','error')
+                    }
+                })
+
+            }else{
+                swal('请选择商品','','error');
+            }
         });
 
     </script>

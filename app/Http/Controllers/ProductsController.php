@@ -74,7 +74,8 @@ class ProductsController extends Controller
     {
         $user = $request->user();
         if($user->favoriteProducts()->find($product->id)){
-            throw new InvalidRequestException('此商品已经被收藏');
+            //throw new InvalidRequestException('此商品已经被收藏');
+            return [];
         }
         $user->favoriteProducts()->attach($product->id);
         return [];
