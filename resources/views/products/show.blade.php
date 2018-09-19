@@ -36,7 +36,11 @@
                             </div>
                             <div class="cart_amount"><label>数量</label><input type="text" class="form-control input-sm" value="1"><span>件</span><span class="stock"></span></div>
                             <div class="buttons">
-                                <button class="btn btn-success btn-favor">❤ 收藏</button>
+                                @if($favor)
+                                    <button class="btn btn-danger btn-disfavor">❤ 取消收藏</button>
+                                @else
+                                    <button class="btn btn-success btn-favor">❤ 收藏</button>
+                                @endif
                                 <button class="btn btn-primary btn-add-to-cart">加入购物车</button>
                             </div>
                         </div>
@@ -72,5 +76,38 @@
             });
 
         });
+
+        //添加收藏
+        $('.btn-favor').click(function () {
+            axios.post('{{ route('products.favor' ,$product->id) }}')
+                //返回成功
+                .then(function(){
+                    swal('收藏成功','','success').then(
+                            function(){
+                                location.reload();
+                            }
+                    );
+                    //返回失败
+            }, function(error){
+                    if(error.response&&error.response.data.message==401){
+                        swal('请先登录','','error');
+                    }else if(error.response&&error.response.data.message){
+                        swal(error.response.data.message,'','error')
+                    }else{
+                        swal('系统错误','','error')
+                    }
+            });
+        });
+
+        $('.btn-disfavor').click(function(){
+            axios.delete('{{ route('products.favor' ,$product->id) }}')
+                .then(function(){
+                    swal('操作成功','','success').then(function(){
+                        location.reload();
+                    });
+                });
+
+        });
+
     </script>
 @endsection

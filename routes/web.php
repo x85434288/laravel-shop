@@ -23,6 +23,7 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('/email_verify_notice', 'PagesController@emailVerifyNotice')->name('email_verify_notice');
     Route::get('/email_verification/send', 'EmailVerificationController@send')->name('email_verification.send');
     Route::get('/email_verification/verify', 'EmailVerificationController@verify')->name('email_verification.verify');
+
     // 开始
     Route::group(['middleware' => 'email_verified'], function() {
 
@@ -36,6 +37,9 @@ Route::group(['middleware' => 'auth'], function() {
         //用户详细地址路由
         Route::resource('user_addresses','UserAddressesController')->except('show');
 
+        //用户添加收藏
+        Route::post('/products/{product}/favorite', 'ProductsController@favor')->name('products.favor');
+        Route::delete('/products/{product}/favorite', 'ProductsController@disfavor')->name('products.disfavor');
     });
     // 结束
 });
