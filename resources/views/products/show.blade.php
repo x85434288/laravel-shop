@@ -89,7 +89,7 @@
                     );
                     //返回失败
             }, function(error){
-                    if(error.response&&error.response.data.message==401){
+                    if(error.response&&error.response.status ==401){
                         swal('请先登录','','error');
                     }else if(error.response&&error.response.data.message){
                         swal(error.response.data.message,'','error')
@@ -122,10 +122,12 @@
                     'sku_id' : sku_id
                 }).then(function(){
                     //请求成功
-                    swal('加入收藏成功','','success')
+                    swal('加入购物车成功','','success').then(function(){
+                        location.href="{{ route('cart_items.index') }}";
+                    });
                 },function(error){
                     //请求失败
-                    if(error.response&&error.response.data.message == 401){
+                    if(error.response.status === 401){
                         swal('请先登录','','error');
                     }else if(error.response.status == 422){
                        var html = '<div>';
@@ -133,7 +135,7 @@
                             _.each(errors,function(error){
                                 html += error + '<br/>';
                             })
-                        })
+                        });
                         html = html+'</div>';
                         swal({content: $(html)[0], icon: 'error'})
                     }else{

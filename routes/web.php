@@ -44,6 +44,11 @@ Route::group(['middleware' => 'auth'], function() {
 
         //用户添加购物车
         Route::post('/cart_items','CartItemsController@store')->name('cart_items.store');
+        //购物车展示页面
+        Route::get('/cart_items','CartItemsController@index')->name('cart_items.index');
+
+        //移除购物车中的商品
+        Route::delete('/cart_items/{sku}','CartItemsController@remove')->name('cart_items.remove');
 
     });
     // 结束

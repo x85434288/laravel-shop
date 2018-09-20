@@ -16,6 +16,9 @@
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <!-- 登录注册链接开始 -->
+                <li>
+                    <a href="{{ route('cart_items.index') }}"><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span></a>
+                </li>
                 @guest
                 <li><a href="{{ route('login') }}">登录</a></li>
                 <li><a href="{{ route('register') }}">注册</a></li>
@@ -30,6 +33,7 @@
                         <ul class="dropdown-menu" role="menu">
                             <li>
                                 <a href="{{ route('products.favorites') }}">我的收藏</a>
+                                {{--<a href="{{ route('cart_items.index') }}">我的购物车</a>--}}
                                 <a href="{{ route('user_addresses.index') }}">收货地址</a>
                                 <a href="{{ route('logout') }}"
                                    onclick="event.preventDefault();

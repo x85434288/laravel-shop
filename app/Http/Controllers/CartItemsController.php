@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\CartItem;
+use App\Models\ProductSku;
 use Illuminate\Http\Request;
 use App\Http\Requests\CartRequest;
 
 class CartItemsController extends Controller
 {
-    //
+    //添加购物车
     public function store(CartRequest $request)
     {
         $user = $request->user();
@@ -34,6 +35,23 @@ class CartItemsController extends Controller
 
         return [];
 
+    }
+
+
+    //购物车商品列表
+    public function index(Request $request)
+    {
+
+        $carts = $request->user()->cartItems()->with(['productSku.product'])->get();
+        return view('cart.index',compact('carts'));
+        
+    }
+
+    //购物车删除商品
+    public function remove(ProductSku $sku, Request $request)
+    {
+        $request->user()->cartItems()->where('product_sku_id', $sku->id)->delete();
+        return [];
     }
 
 }
