@@ -46,6 +46,33 @@
                         @endif
                         </tbody>
                     </table>
+                    <div>
+                        <form class="form-horizontal" role="form" id="order-form">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">
+                                    请选择收货地址：
+                                </label>
+                                <div class="col-sm-9 col-md-7">
+                                    <select class="form-control" name="address">
+                                        @foreach($addresses as $address)
+                                            <option value="{{ $address->id }}">{{ $address->full_address }} {{ $address->contact_name }} {{ $address->contact_phone }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">订单备注：</label>
+                                <div class="col-sm-9 col-md-7">
+                                    <textarea name="extra" class="form-control" cols="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-3">
+                                    <button type="button" class="btn btn-primary btn-create-order">提交订单</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -93,6 +120,59 @@
             $('input[name=select][type=checkbox]:not([disabled])').each(function(){
                 // 将其勾选状态设为与目标单选框一致
                 $(this).prop('checked',checked);
+            });
+        });
+
+        //监听提交订单按钮点击事件
+        $('.btn-create-order').click(function(){
+            var req = {
+
+                'address_id': $('#order-form').find('select[name=address]').val(),
+                'items'  : [],
+                'extra'  : $('#order-form').find('textarea[name=extra]').val()
+            };
+            $('table tr[data-id]').each(function(){
+                //获取当行单选框
+                var checkbox = $(this).find('input[type=checkbox][name=select]');
+                //如果当前单选框被禁用或者未被选择，返回
+                if(checkbox.prop('disable')||!checkbox.prop('checked')){
+                    return;
+                }
+                //获取当前输入的数量
+                var amount = $(this).find('input[name=amount]').val();
+                // 如果用户将数量设为 0 或者不是一个数字，则也跳过
+                if(isNaN(amount)||amount==0){
+                    return;
+                }
+                //吧sku_id和amount加入数组
+                req.items.push({
+                    'sku_id':$(this).data('id'),
+                    'amount':amount
+                });
+            });
+            axios.post('{{ route('orders.store') }}', req).then(function(){
+                //成功
+                swal('提交订单成功','','success').then(
+                        function(){
+                            location.reload();
+                        }
+                );
+            },function(error){
+                //请求失败
+                if(error.response.status === 401){
+                    swal('请先登录','','error');
+                }else if(error.response.status == 422){
+                    var html = '<div>';
+                    _.each(error.response.data.errors,function(errors){
+                        _.each(errors,function(error){
+                            html += error + '<br/>';
+                        })
+                    });
+                    html = html+'</div>';
+                    swal({content: $(html)[0], icon: 'error'})
+                }else{
+                    swal('系统错误','','error')
+                }
             });
         });
 

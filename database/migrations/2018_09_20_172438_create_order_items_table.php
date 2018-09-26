@@ -15,7 +15,7 @@ class CreateOrderItemsTable extends Migration
     {
         Schema::create('order_items', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('order_id')->unique();
+            $table->unsignedInteger('order_id');
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');  //与order表进行关联
             $table->unsignedInteger('product_id');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
@@ -24,9 +24,9 @@ class CreateOrderItemsTable extends Migration
             $table->integer('amount');     //数量
             $table->decimal('price',10,2);   //单价
             $table->unsignedInteger('rating')->nullable();  //用户打分
-            $table->text('review');   //用户评价
+            $table->text('review')->nullable();   //用户评价
             $table->timestamp('reviewed_at')->nullable();   //评价时间
-            $table->timestamps();
+            //$table->timestamps();
         });
     }
 

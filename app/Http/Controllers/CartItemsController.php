@@ -42,8 +42,9 @@ class CartItemsController extends Controller
     public function index(Request $request)
     {
 
+        $addresses = $request->user()->addresses()->orderBy('last_used_at','desc')->get();
         $carts = $request->user()->cartItems()->with(['productSku.product'])->get();
-        return view('cart.index',compact('carts'));
+        return view('cart.index',compact('carts','addresses'));
         
     }
 
