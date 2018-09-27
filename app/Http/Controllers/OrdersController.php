@@ -9,6 +9,7 @@ use App\Models\Order;
 use Carbon\Carbon;
 use App\Exceptions\InvalidRequestException;
 use App\Jobs\CloseOrder;
+use Auth;
 
 class OrdersController extends Controller
 {
@@ -66,6 +67,19 @@ class OrdersController extends Controller
         //触发关闭订单的延时任务
         $this->dispatch(new CloseOrder($order ,config('app.order_ttl')));
         return $order;
+    }
+
+
+    //个人订单列表
+    public function index(Order $order)
+    {
+        $user = Auth::user();
+        $orders = $order->with(['items.product','items.sku'])
+            ->where('user_id', $user->id)
+            ->orderBy('created_at','desc')
+            ->paginate();
+
+        return view('orders.index',compact('orders'));
     }
 
 }

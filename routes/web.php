@@ -51,6 +51,8 @@ Route::group(['middleware' => 'auth'], function() {
         Route::delete('/cart_items/{sku}','CartItemsController@remove')->name('cart_items.remove');
 
         Route::post('/orders','OrdersController@store')->name('orders.store');
+        Route::get('/orders','OrdersController@index')->name('orders.index');
+        Route::get('/orders/{order}','OrdersController@show')->name('orders.show');
 
     });
     // 结束
