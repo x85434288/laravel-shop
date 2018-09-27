@@ -230,5 +230,7 @@ return [
     ],
 
     'faker_locale' => 'zh_CN',
+    //订单延时关闭时间 单位秒
+    'order_ttl' => 900,
 
 ];

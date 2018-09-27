@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Exceptions\InternalException;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Product;
 
@@ -16,5 +17,26 @@ class ProductSku extends Model
     {
 
         return $this->belongsTo(Product::class);
+    }
+
+    //减库存
+    public function decreaseStock($amount)
+    {
+        if($amount<0){
+            throw new InternalException('减库存不可小于0');
+        }
+
+        return $this->newQuery()->where('id', $this->id)->where('stock', '>=', $amount)->decrement('stock', $amount);
+        
+    }
+
+    //加库存
+    public function addStock($amount)
+    {
+        if($amount<0){
+            throw new InternalException('减库存不可小于0');
+        }
+
+        return $this->increment('stock', $amount);
     }
 }
