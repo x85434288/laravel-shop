@@ -150,11 +150,12 @@
                     'amount':amount
                 });
             });
-            axios.post('{{ route('orders.store') }}', req).then(function(){
+            axios.post('{{ route('orders.store') }}', req).then(function(response){
                 //成功
                 swal('提交订单成功','','success').then(
                         function(){
-                            location.reload();
+                            //location.reload();
+                            location.href =  '/orders/' + response.data.id;
                         }
                 );
             },function(error){

@@ -6,32 +6,43 @@ use App\Models\CartItem;
 use App\Models\ProductSku;
 use Illuminate\Http\Request;
 use App\Http\Requests\CartRequest;
+use App\Services\CartService;
 
 class CartItemsController extends Controller
 {
+
+
+    protected $cartService;
+
+    public function __construct(CartService $cartService)
+    {
+        $this->cartService = $cartService;
+    }
+
     //添加购物车
     public function store(CartRequest $request)
     {
         $user = $request->user();
         $product_sku_id = $request->input('sku_id');
         $amount = $request->input('amount');
+        $this->cartService->save($product_sku_id, $amount);
         //如果此商品已经加入了购物车
-        if($cart = $user->cartItems()->where('product_sku_id', $product_sku_id)->first()){
-            //商品数量加上添加的数量
-            $cart->update([
-                'amount' => $cart->amount + $amount
-            ]);
-        }else{
-
-            //如果不存在 此在数据库中添加此记录
-            $cart = new CartItem([
-                'amount' => $amount
-            ]);
-
-            $cart->user()->associate($user);
-            $cart->productSku()->associate($product_sku_id);
-            $cart->save();
-        }
+//        if($cart = $user->cartItems()->where('product_sku_id', $product_sku_id)->first()){
+//            //商品数量加上添加的数量
+//            $cart->update([
+//                'amount' => $cart->amount + $amount
+//            ]);
+//        }else{
+//
+//            //如果不存在 此在数据库中添加此记录
+//            $cart = new CartItem([
+//                'amount' => $amount
+//            ]);
+//
+//            $cart->user()->associate($user);
+//            $cart->productSku()->associate($product_sku_id);
+//            $cart->save();
+//        }
 
         return [];
 
@@ -43,7 +54,8 @@ class CartItemsController extends Controller
     {
 
         $addresses = $request->user()->addresses()->orderBy('last_used_at','desc')->get();
-        $carts = $request->user()->cartItems()->with(['productSku.product'])->get();
+        $carts = $this->cartService->get();
+        //$carts = $request->user()->cartItems()->with(['productSku.product'])->get();
         return view('cart.index',compact('carts','addresses'));
         
     }
@@ -51,7 +63,9 @@ class CartItemsController extends Controller
     //购物车删除商品
     public function remove(ProductSku $sku, Request $request)
     {
-        $request->user()->cartItems()->where('product_sku_id', $sku->id)->delete();
+
+        //$request->user()->cartItems()->where('product_sku_id', $sku->id)->delete();
+        $this->cartService->remove($sku->id);
         return [];
     }
 
