@@ -2,9 +2,9 @@
 
 return [
     'alipay' => [
-        'app_id'         => '',
-        'ali_public_key' => '',
-        'private_key'    => '',
+        'app_id' => '你在支付宝沙箱看到的appid',
+        'ali_public_key' => '支付宝沙箱显示的公钥',
+        'private_key' => '刚刚生成的私钥',
         'log'            => [
             'file' => storage_path('logs/alipay.log'),
         ],
