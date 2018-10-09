@@ -60,6 +60,8 @@ Route::group(['middleware' => 'auth'], function() {
         //支付宝前端回调
         Route::get('/payment/alipay/return','PaymentController@alipayReturn')->name('payment.alipay.return');
 
+        //微信支付
+        Route::get('payment/{order}/wechat', 'PaymentController@payByWechat')->name('payment.wechat');
 
     });
     // 结束
@@ -76,6 +78,8 @@ Route::get('/products/{product}','ProductsController@show')->name('products.show
 
 //支付宝服务器端回调  此url要避免csrf验证  修改app/middleware/VerifyCsrfToken.php
 Route::post('/payment/alipay/notify','PaymentController@alipayNotify')->name('payment.alipay.notify');
+//微信支付服务器端回调
+Route::post('payment/wechat/notify', 'PaymentController@wechatNotify')->name('payment.wechat.notify');
 
 //Route::get('alipay',function(){
 //    return app('alipay')->web([
