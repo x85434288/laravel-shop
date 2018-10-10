@@ -88,3 +88,5 @@ Route::post('payment/wechat/notify', 'PaymentController@wechatNotify')->name('pa
 //        'subject' => '测试',
 //    ]);
 //});
+
+//Route::get('/payment/{order}/test', 'PaymentController@test')->name('payment.test');
