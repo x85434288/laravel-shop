@@ -24,11 +24,21 @@ class OrdersController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('header');
-            $content->description('description');
+            $content->header('订单管理');
+            $content->description('列表');
 
 
             $content->body($this->grid());
+        });
+    }
+
+
+    //展示详细订单消息
+    public function show(Order $order)
+    {
+        return Admin::content(function(Content $content) use ($order){
+            $content->header('订单详情');
+            $content->body(view('admin.orders.show',['order'=>$order]));
         });
     }
 
@@ -73,6 +83,9 @@ class OrdersController extends Controller
     protected function grid()
     {
         return Admin::grid(Order::class, function (Grid $grid) {
+
+            // 只展示已支付的订单，并且默认按支付时间倒序排序
+            //$grid->model()->whereNotNull('paid_at')->orderBy('paid_at', 'desc');
 
             $grid->id('ID')->sortable();
             $grid->no('订单流水号');
@@ -120,4 +133,6 @@ class OrdersController extends Controller
             $form->display('updated_at', 'Updated At');
         });
     }
+
+
 }
