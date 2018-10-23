@@ -10,6 +10,8 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
+use Illuminate\Http\Request;
+use App\Exceptions\InvalidRequestException;
 
 class OrdersController extends Controller
 {
@@ -40,6 +42,33 @@ class OrdersController extends Controller
             $content->header('订单详情');
             $content->body(view('admin.orders.show',['order'=>$order]));
         });
+    }
+    
+    //发货
+    public function ship(Order $order, Request $request)
+    {
+
+        //判断是否支付
+        if(!$order->paid_at){
+            throw new InvalidRequestException('订单未付款');
+        }
+        //判断是否发货
+        if($order->ship_status !== Order::SHIP_STATUS_PENDING){
+            throw new InvalidRequestException('该订单已发货');
+        }
+        $data = $this->validate($request,[
+            'express_company' => ['required'],
+            'express_no'      => ['required'],
+        ],[], [
+            'express_company' => '物流公司',
+            'express_no'      => '物流单号',
+        ]);
+        // 我们在 Order 模型的 $casts 属性里指明了 ship_data 是一个数组
+        // 因此这里可以直接把数组传过去
+        $order->update(['ship_status'=>Order::SHIP_STATUS_DELIVERED,'ship_data'=>$data]);
+        // 返回上一页
+        return redirect()->back();
+        
     }
 
     /**

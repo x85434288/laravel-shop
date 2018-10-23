@@ -41,8 +41,48 @@
             @endforeach
             <tr>
                 <td>订单金额：</td>
-                <td colspan="3">￥{{ $order->total_amount }}</td>
+                <td>￥{{ $order->total_amount }}</td>
+                <td>发货状态：</td>
+                <td>{{ \App\Models\Order::$shipStatusMap[$order->ship_status] }}</td>
             </tr>
+            <!-- 未发货显示物流表单  -->
+            @if($order->ship_status === \App\Models\Order::SHIP_STATUS_PENDING)
+                <tr>
+                    <td colspan="4">
+                        <form action="{{ route('admin.orders.ship',$order->id) }}" method="post" class="form-inline">
+                            <div class="form-group" {{ $errors->has('express_company')?'has_error':'' }}>
+                                <label class="control-label">物流公司:</label>
+                                <input class="form-control" name="express_company" type="text">
+                                @if($errors->has('express_company'))
+                                    @foreach($errors->get('express_company') as $msg)
+                                        <span class="help-block">{{ $msg }}</span>
+                                    @endforeach
+                                @endif
+                            </div>
+                            <div class="form-group" {{ $errors->has('express_no')?'has_error':'' }}>
+                                <label class="control-label">物流订单:</label>
+                                <input class="form-control" name="express_no" type="text">
+                                @if($errors->has('express_no'))
+                                    @foreach($errors->get('express_no') as $msg)
+                                        <span class="help-block">{{ $msg }}</span>
+                                    @endforeach
+                                @endif
+                            </div>
+                            {{ csrf_field() }}
+                            <button type="submit" class="btn btn-primary">提交</button>
+                        </form>
+                    </td>
+                </tr>
+                <!-- 发货显示物流状态和订单号  -->
+                @else
+                <tr>
+                    <td>快递公司</td>
+                    <td>{{ $order->ship_data['express_company'] }}</td>
+                    <td>快递单号</td>
+                    <td>{{ $order->ship_data['express_no'] }}</td>
+                </tr>
+            @endif
+
             </tbody>
         </table>
     </div>
