@@ -42,9 +42,13 @@
                     </table>
                     <div class="order-bottom">
                         <div class="order-info">
+
                             <div class="line"><div class="line-label">收货地址：</div><div class="line-value">{{ join(' ', $order->address) }}</div></div>
                             <div class="line"><div class="line-label">订单备注：</div><div class="line-value">{{ $order->remark ?: '-' }}</div></div>
                             <div class="line"><div class="line-label">订单编号：</div><div class="line-value">{{ $order->no }}</div></div>
+                            <div class="line"><div class="line-label">物流状态：</div><div class="line-value">{{ \App\Models\Order::$shipStatusMap[$order->ship_status] }}</div></div>
+                            <div class="line"><div class="line-label">快递公司：</div><div class="line-value">{{ $order->ship_data['express_company'] }}   快递单号:{{ $order->ship_data['express_no'] }}</div></div>
+
                         </div>
                         <div class="order-summary text-right">
                             <div class="total-amount">
@@ -76,6 +80,12 @@
                                         <button class="btn btn-primary btn-sm" id="btn-wechat">微信支付</button>
                                     </div>
                                 @endif
+
+                            </div>
+                            <div>
+                                @if($order->ship_status === \App\Models\Order::SHIP_STATUS_DELIVERED)
+                                    <button class="btn btn-primary" id="order_received">确认收货</button>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -98,6 +108,31 @@
                     if(result){
                         location.reload();
                     }
+                });
+            });
+
+            $('#order_received').click(function(){
+                swal({
+
+                    title: "确认已经收到商品？",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                    buttons: ['取消', '确认收到'],
+
+                }).then(function(willReceived){
+                    if(!willReceived){
+                        return;
+                    }
+                    axios.post('{{ route("orders.received",$order->id) }}').then(
+                            function(){
+                                swal('成功','','success').then(
+                                        function(){
+                                            location.reload();
+                                        }
+                                );
+                            }
+                    );
                 });
             });
         });

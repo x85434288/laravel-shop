@@ -108,4 +108,20 @@ class OrdersController extends Controller
         return view('orders.show',compact('order'));
     }
 
+    //用户确认收货
+    public function received(Order $order)
+    {
+        $this->authorize('own', $order);
+
+        //判断订单是否发货
+        if($order->ship_status !== Order::SHIP_STATUS_DELIVERED){
+            throw new InvalidRequestException('订单的支付状态不正确');
+        }
+
+        $order->update(['ship_status'=> Order::SHIP_STATUS_RECEIVED]);
+
+        //返回订单信息
+        return $order;
+    }
+
 }
