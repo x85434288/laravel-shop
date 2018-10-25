@@ -12,6 +12,9 @@ use App\Jobs\CloseOrder;
 use Auth;
 use App\Services\CartService;
 use App\Services\OrderService;
+use App\Http\Requests\ReviewedRequest;
+use App\Events\OrderReviewed;
+
 
 class OrdersController extends Controller
 {
@@ -122,6 +125,60 @@ class OrdersController extends Controller
 
         //返回订单信息
         return $order;
+    }
+
+
+    //显示商品评价
+    public function review(Order $order)
+    {
+
+        $this->authorize('own', $order);
+
+        if (!$order->paid_at) {
+            throw new InvalidRequestException('该订单未支付，不可评价');
+        }
+
+        $orders = $order->load(['items.sku', 'items.product']);
+        return view('orders.review',compact('orders'));
+
+    }
+
+    //添加商品评价
+    public function sendReview(Order $order, ReviewedRequest $request)
+    {
+        $this->authorize('own', $order);
+        //如果未支付 不能评价
+        if (!$order->paid_at) {
+            throw new InvalidRequestException('该订单未支付，不可评价');
+        }
+        //判断是否评价
+        if($order->reviewed){
+            throw new InvalidRequestException('不可重复评价');
+        }
+        $reviews = $request->input('reviews');
+        //开启事务
+        \DB::transaction(function() use($order, $reviews){
+
+            foreach($reviews as $review){
+                // 遍历用户提交的数据
+                $orderItem = $order->items()->find($review['id']);
+                //添加订单评论与打分
+                $orderItem->update([
+                    'rating' => $review['rating'],
+                    'review' => $review['review'],
+                    'reviewed_at' => Carbon::now()
+                ]);
+
+            }
+            //修改订单状态为已评论
+            $order->update(['reviewed'=>true]);
+            //更新商品的评论数
+            event(new OrderReviewed($order));
+
+        });
+
+        //返回上一步操作
+        return redirect()->back();
     }
 
 }

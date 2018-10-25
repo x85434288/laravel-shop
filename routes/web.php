@@ -54,6 +54,12 @@ Route::group(['middleware' => 'auth'], function() {
         Route::get('/orders','OrdersController@index')->name('orders.index');
         Route::get('/orders/{order}','OrdersController@show')->name('orders.show');
 
+        //显示商品评价
+        Route::get('/orders/{order}/review','OrdersController@review')->name('orders.review.show');
+        //提交商品评价
+        Route::post('/orders/{order}/review','OrdersController@sendReview')->name('orders.review.store');
+
+
         //用户确认收货
         Route::post('/orders/{order}/received','OrdersController@received')->name('orders.received');
 

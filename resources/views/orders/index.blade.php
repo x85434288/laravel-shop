@@ -65,7 +65,10 @@
                                                                     否则将自动失效
                                                                 @endif
                                                             </td>
-                                                            <td rowspan="{{ count($order->items) }}"><a href="{{ route('orders.show',$order->id) }}" class="btn btn-primary btn-xs">查看订单</a></td>
+                                                            <td rowspan="{{ count($order->items) }}">
+                                                                <a href="{{ route('orders.show',$order->id) }}" class="btn btn-primary btn-xs">查看订单</a>
+                                                                <a href="{{ route('orders.review.show',$order->id) }}" class="btn btn-primary btn-xs">{{ $order->reviewed?'查看评价':'评价' }}</a>
+                                                            </td>
                                                         @endif
                                                     </tr>
                                                 @endforeach

@@ -9,6 +9,8 @@ use Illuminate\Auth\Events\Registered;
 use App\Listeners\UpdateProductSoldCount;
 use App\Events\OrderPaid;
 use App\Listeners\SendOrderPaidEmail;
+use App\Events\OrderReviewed;
+use App\Listeners\UpdateProductReview;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -30,6 +32,11 @@ class EventServiceProvider extends ServiceProvider
             UpdateProductSoldCount::class,   //增加商品销量
             SendOrderPaidEmail::class,     //发送支付成功邮件
         ],
+        //订单评论成功是触发
+        OrderReviewed::class => [
+            UpdateProductReview::class,   //修改商品评论数和评分
+        ]
+
 
 
     ];
