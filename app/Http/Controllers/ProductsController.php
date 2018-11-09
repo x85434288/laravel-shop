@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Exceptions\InvalidRequestException;
@@ -63,10 +64,20 @@ class ProductsController extends Controller
         $favor = false;
         //判断是否登录
         if($user = $request->user()){
+            //判断商品是否被收藏
             $favor = boolval($user->favoriteProducts()->find($product->id));
         }
+        //获取商品评论
+        $reviews = OrderItem::query()
+            ->with(['order.user','sku']) // 预先加载关联关系
+            ->where('product_id', $product->id)
+            ->whereNotNull('reviewed_at')// 筛选出已评价的
+            ->orderBy('reviewed_at','desc')// 按评价时间倒序
+            ->limit(10)
+            ->get();
 
-        return view('products.show',compact('product','favor'));
+
+        return view('products.show',compact('product','favor','reviews'));
     }
 
     //添加商品收藏
