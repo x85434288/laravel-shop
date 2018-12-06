@@ -47,8 +47,14 @@
                             <div class="line"><div class="line-label">订单备注：</div><div class="line-value">{{ $order->remark ?: '-' }}</div></div>
                             <div class="line"><div class="line-label">订单编号：</div><div class="line-value">{{ $order->no }}</div></div>
                             <div class="line"><div class="line-label">物流状态：</div><div class="line-value">{{ \App\Models\Order::$shipStatusMap[$order->ship_status] }}</div></div>
-                            <div class="line"><div class="line-label">快递公司：</div><div class="line-value">{{ $order->ship_data['express_company'] }}   快递单号:{{ $order->ship_data['express_no'] }}</div></div>
-
+                            @if($order->ship_data)
+                                <div class="line"><div class="line-label">快递公司：</div><div class="line-value">{{ $order->ship_data['express_company'] }}   快递单号:{{ $order->ship_data['express_no'] }}</div></div>
+                            @endif
+                            <!-- 订单已支付，且退款状态不是未退款时展示退款信息 -->
+                            @if($order->paid_at&&$order->refund_status !== \App\Models\Order::REFUND_STATUS_PENDING)
+                                    <div class="line"><div class="line-label">退款状态：</div><div class="line-value">{{ \App\Models\Order::$refundStatusMap[$order->refund_status] }}</div></div>
+                                    <div class="line"><div class="line-label">退款理由：</div><div class="line-value">{{ $order->extra['refund_reason'] }}</div></div>
+                            @endif
                         </div>
                         <div class="order-summary text-right">
                             <div class="total-amount">
@@ -85,6 +91,11 @@
                             <div>
                                 @if($order->ship_status === \App\Models\Order::SHIP_STATUS_DELIVERED)
                                     <button class="btn btn-primary" id="order_received">确认收货</button>
+                                @endif
+                            </div>
+                            <div>
+                                @if($order->paid_at && $order->refund_status === \App\Models\Order::REFUND_STATUS_PENDING)
+                                    <button class="btn btn-primary" id="order_refund">申请退款</button>
                                 @endif
                             </div>
                         </div>
@@ -135,6 +146,31 @@
                     );
                 });
             });
+
+            $("#order_refund").click(function(){
+                swal({
+                    text:'请输入退款理由',
+                    content: 'input'
+                }).then(function(input){
+                    if(!input){
+                        swal('退款理由不能为空','','error');
+                        return;
+                    }
+                    axios.post('{{route("orders.apply_refund",$order->id)}}',{reason:input}).then(
+                            function(){
+                                swal('申请退款成功','','success').then(
+                                        function(){
+                                            location.reload();
+                                        }
+                                );
+                            }
+                    );
+                });
+            });
+
+
+
+
         });
     </script>
 @endsection

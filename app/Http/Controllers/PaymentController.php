@@ -129,8 +129,8 @@ class PaymentController extends Controller
     }
 
     //测试
-//    public function test(Order $order)
-//    {
-//        $this->afterPaid($order);
-//    }
+    public function test(Order $order)
+    {
+        $this->afterPaid($order);
+    }
 }

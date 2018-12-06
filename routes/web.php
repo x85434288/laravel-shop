@@ -72,6 +72,8 @@ Route::group(['middleware' => 'auth'], function() {
         //微信支付
         Route::get('payment/{order}/wechat', 'PaymentController@payByWechat')->name('payment.wechat');
 
+        //用户退款请求
+        Route::post('/orders/{order}/apply_refund','OrdersController@applyRefund')->name('orders.apply_refund');
 
     });
     // 结束

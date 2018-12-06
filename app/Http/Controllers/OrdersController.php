@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ApplyRefundRequest;
 use App\Http\Requests\OrderRequest;
 use App\Models\ProductSku;
 use App\Models\UserAddress;
@@ -180,5 +181,36 @@ class OrdersController extends Controller
         //返回上一步操作
         return redirect()->back();
     }
+
+
+
+    //用户申请退款
+
+    public function applyRefund(Order $order, ApplyRefundRequest $request)
+    {
+        //判断订单是否属于当前用户
+        $this->authorize('own', $order);
+        //判断用户是否支付
+        if(!$order->paid_at){
+            throw new InvalidRequestException('订单未支付');
+        }
+        //判断退款状态是否正确
+        if($order->refund_status !== Order::REFUND_STATUS_PENDING){
+            throw new InvalidRequestException('订单已经申请过退款，请勿重复申请');
+        }
+        $extra = $order->extra?:[];
+        $extra['refund_reason'] = $request->input('reason');
+        //把退款理由入库
+        $order->update([
+            'refund_status' => Order::REFUND_STATUS_APPLIED,
+            'extra' => $extra
+        ]);
+
+        return $order;
+
+    }
+
+
+
 
 }
