@@ -47,6 +47,7 @@
             </tr>
             <!-- 未发货显示物流表单  -->
             @if($order->ship_status === \App\Models\Order::SHIP_STATUS_PENDING)
+                @if($order->refund_status !== \App\Models\Order::REFUND_STATUS_SUCCESS)
                 <tr>
                     <td colspan="4">
                         <form action="{{ route('admin.orders.ship',$order->id) }}" method="post" class="form-inline">
@@ -73,6 +74,7 @@
                         </form>
                     </td>
                 </tr>
+                @endif
                 <!-- 发货显示物流状态和订单号  -->
                 @else
                 <tr>
@@ -83,7 +85,105 @@
                 </tr>
             @endif
 
+            @if($order->refund_status !== \App\Models\Order::REFUND_STATUS_PENDING)
+                <tr>
+                    <td>退款状态：</td>
+                    <td colspan="2">{{ \App\Models\Order::$refundStatusMap[$order->refund_status] }}，理由：{{ $order->extra['refund_reason'] }}</td>
+                    <td>
+                        <!-- 如果订单退款状态是已申请，则展示处理按钮 -->
+                        @if($order->refund_status === \App\Models\Order::REFUND_STATUS_APPLIED)
+                            <button class="btn btn-sm btn-success" id="btn-refund-agree">同意</button>
+                            <button class="btn btn-sm btn-danger" id="btn-refund-disagree">不同意</button>
+                        @endif
+                    </td>
+                </tr>
+            @endif
+
             </tbody>
         </table>
     </div>
 </div>
+
+<script>
+    $(document).ready(function(){
+
+        //点击不同意按钮
+        $("#btn-refund-disagree").click(function(){
+            swal({
+                title: '输入拒绝退款理由',
+                type: 'input',
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonText: "确认",
+                cancelButtonText: "取消"
+            },function(inputValue){
+                if(inputValue === false){
+                    return;
+                }
+                if(!inputValue){
+                    swal('拒绝退款理由不能为空','','error');
+                    return;
+                }
+
+                $.ajax({
+                    url : "{{ route('admin.orders.handle_refund',$order->id) }}",
+                    type : 'post',
+                    data : JSON.stringify({   // 将请求变成 JSON 字符串
+                        agree: false,  // 拒绝申请
+                        reason: inputValue,
+                        // 带上 CSRF Token
+                        // Laravel-Admin 页面里可以通过 LA.token 获得 CSRF Token
+                        _token: LA.token
+                    }),
+                    contentType : "application/json",
+                    success: function(data){
+                        swal({
+                            title : '成功',
+                            type : 'success'
+                        },function(){
+                            location.reload();
+                        });
+                    }
+
+                });
+            });
+        });
+
+        //点击同意按钮
+        $("#btn-refund-agree").click(function(){
+            swal({
+                title: '确认要将款项退还给用户？',
+                type: 'warning',
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonText: "确认",
+                cancelButtonText: "取消"
+            },function(ret){
+                //如果点击取消，则返回
+                if(!ret){
+                    return;
+                }
+                //点击确定，ajax提交请求到接口
+                $.ajax({
+                    url : "{{ route('admin.orders.handle_refund',$order->id) }}",
+                    type : "post",
+                    data : JSON.stringify({
+                        agree : true,  // 接受申请
+                        // 带上 CSRF Token
+                        // Laravel-Admin 页面里可以通过 LA.token 获得 CSRF Token
+                        _token : LA.token
+                    }),
+                    contentType : 'application/json',
+                    success : function(data){
+                        swal({
+                            title : '成功',
+                            type : 'success'
+                        },function(){
+                            location.reload();
+                        });
+                    }
+                });
+            });
+        });
+    });
+</script>

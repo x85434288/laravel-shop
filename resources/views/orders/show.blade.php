@@ -55,6 +55,7 @@
                                     <div class="line"><div class="line-label">退款状态：</div><div class="line-value">{{ \App\Models\Order::$refundStatusMap[$order->refund_status] }}</div></div>
                                     <div class="line"><div class="line-label">退款理由：</div><div class="line-value">{{ $order->extra['refund_reason'] }}</div></div>
                             @endif
+
                         </div>
                         <div class="order-summary text-right">
                             <div class="total-amount">
@@ -77,6 +78,7 @@
                                         请于 {{ $order->created_at->addSecond(config('app.order_ttl'))->format('H:i') }}前完成，<br>
                                         否则将自动失效
                                     @endif
+
                                 </div>
 
                                 @if(!$order->closed && !$order->paid_at)
@@ -88,12 +90,20 @@
                                 @endif
 
                             </div>
+                            @if(isset($order->extra['refund_disagree_reason']))
                             <div>
+                                <span>拒绝退款理由</span>
+                                <div class="value">
+                                    {{ $order->extra['refund_disagree_reason'] }}
+                                </div>
+                            </div>
+                            @endif
+                            <div class="receive-button">
                                 @if($order->ship_status === \App\Models\Order::SHIP_STATUS_DELIVERED)
                                     <button class="btn btn-primary" id="order_received">确认收货</button>
                                 @endif
                             </div>
-                            <div>
+                            <div class="refund-button">
                                 @if($order->paid_at && $order->refund_status === \App\Models\Order::REFUND_STATUS_PENDING)
                                     <button class="btn btn-primary" id="order_refund">申请退款</button>
                                 @endif
