@@ -11,11 +11,6 @@
 |
 */
 
-//Route::get('/', function () {
-//    return view('welcome');
-//});
-
-
 
 Auth::routes();
 
@@ -92,6 +87,8 @@ Route::get('/products/{product}','ProductsController@show')->name('products.show
 Route::post('/payment/alipay/notify','PaymentController@alipayNotify')->name('payment.alipay.notify');
 //微信支付服务器端回调
 Route::post('payment/wechat/notify', 'PaymentController@wechatNotify')->name('payment.wechat.notify');
+//微信退款服务器端回调
+Route::post('payment/wechat/refund_notify', 'PaymentController@wechatRefundNotify')->name('payment.wechat.refund_notify');
 
 //Route::get('alipay',function(){
 //    return app('alipay')->web([
