@@ -122,6 +122,13 @@ class Order extends Model
         self::query()->where('refund_no')->exists()
         );
     }
+    
+    
+    //订单与优惠券表关联
+    public function couponCode()
+    {
+        return $this->belongsTo(CouponCode::class);
+    }
 
 
 
