@@ -17,9 +17,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        //注册模型事件监听
+        \App\Models\Category::observe(\App\Observers\CategoryObserver::class);
+
         Schema::defaultStringLength(191);
         \Carbon\Carbon::setLocale('zh');
+
     }
 
     /**
