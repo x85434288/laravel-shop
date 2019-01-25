@@ -51,7 +51,7 @@ class Category extends Model
     }
 
     // 定义一个访问器，获取以 - 为分隔的所有祖先类目名称以及当前类目的名称
-    public function getFullNamesAttribute()
+    public function getFullNameAttribute()
     {
         return $this->ancestors  // 获取所有祖先类目
         ->pluck('name') // 取出所有祖先类目的 name 字段作为一个数组
