@@ -61,7 +61,7 @@ class CouponCode extends Model
             //生成一个自定长度的字符串，并转化为大写
             $code = strtoupper(Str::random($length));
         }while(
-            //如果已经生成，则继续生成
+            //如果已经存在，则继续生成
             self::query()->where('code',$code)->exists()
         );
        return $code;
