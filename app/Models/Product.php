@@ -43,4 +43,9 @@ class Product extends Model
             ->orderBy('user_favorite_products.created_at','desc');
     }
 
+    public function category()
+    {
+        return $this->belongsTo(Category::class,'category_id');
+    }
+
 }

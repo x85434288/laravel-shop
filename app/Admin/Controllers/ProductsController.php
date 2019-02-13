@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Category;
 use App\Models\product;
 
 use Encore\Admin\Form;
@@ -78,6 +79,8 @@ class ProductsController extends Controller
             //第一列为id,并将此设置为可排序列
             $grid->id('ID')->sortable();
 
+            // Laravel-Admin 支持用符号 . 来展示关联关系的字段
+            $grid->column('category.name', '类目');
 
             $grid->title('商品名称');
 
@@ -124,6 +127,13 @@ class ProductsController extends Controller
         return Admin::form(product::class, function (Form $form) {
 
             $form->text('title', '商品名称')->rules('required');
+            $form->select('category_id','类目')->options(function($id){
+                $category = Category::find($id);
+                if($category){
+                    return [$category->id=>$category->full_name];
+                }
+            })->ajax('/admin/api/categories?is_directory=0');
+
             $form->image('image', '封面图片')->rules('required|image');
             $form->editor('description', '商品描述')->rules('required');
             $form->radio('on_sale','上架')->options(['1'=>'是','0'=>'否'])->default(0);
